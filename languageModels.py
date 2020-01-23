@@ -1,22 +1,23 @@
 from collections import Counter
 import math
-
-# Given a file creates unigram, bigram and trigram models
-# Returns maps of unigrams, bigrams, trigrams -> their probabilities in the vocabulary
 from nltk import ngrams
 
-
+# Given a train file creates unigram, bigram and trigram models
+# Returns maps of unigrams, bigrams, trigrams -> their probabilities in the vocabulary
 def corpus_to_probabilities(path):
-    unigram_freq = dict({"UNK": 0})
-    bigram_freq = dict({"UNK": 0})
-    trigram_freq = dict({"UNK": 0})
 
+    # Initialize unigram dictionary and set UNK count to 0
+    unigram_freq = dict({"UNK": 0})
+
+    # Initialize lists of tokens for n-grams
     unigrams = list()
     bigrams = list()
     trigrams = list()
 
+    # Sentence count
     sent_count = 0
 
+    # Tokenize the file line by line
     f = open(path)
     while True:
         sentences = f.readlines()
@@ -29,13 +30,21 @@ def corpus_to_probabilities(path):
                 unigrams += tokens + ["<stop>"]
                 bigrams += ["<start>"] + tokens + ["<stop>"]
                 trigrams += ["<start>"] + tokens + ["<stop>"]
+    f.close()
 
-    bigrams = list(ngrams(bigrams, 2))
-    trigrams = list(ngrams(trigrams, 3))
+    # Add UNKs to bigrams, trigrams
+    freq = Counter(bigrams)
+    tokens_w_unks = ["UNK" if freq[element] < 3 else element for element in bigrams]
+    unked_tokens = [element for element in bigrams if freq[element] < 3]
 
+    # Create lists of bigrams and trigrams
+    bigrams = list(ngrams(tokens_w_unks, 2))
+    trigrams = list(ngrams(tokens_w_unks, 3))
+
+    # Create frequency dictionaries
     temp_uni = Counter(unigrams)
-    temp_bi = Counter(bigrams)
-    temp_tri = Counter(trigrams)
+    bigram_freq = Counter(bigrams)
+    trigram_freq = Counter(trigrams)
 
     for t in temp_uni:
         if temp_uni[t] < 3:
@@ -43,33 +52,13 @@ def corpus_to_probabilities(path):
         else:
             unigram_freq[t] = temp_uni[t]
 
-    for t in temp_bi:
-        if temp_bi[t] < 3:
-            bigram_freq["UNK"] += 1
-        else:
-            bigram_freq[t] = temp_bi[t]
-
-    for t in temp_tri:
-        if temp_tri[t] < 3:
-            trigram_freq["UNK"] += 1
-        else:
-            trigram_freq[t] = temp_tri[t]
-
+    # How big is the vocabulary
     vocab = sum(unigram_freq.values())
-    unigram_prob = {k: float(v) / vocab for k, v in unigram_freq.items()}
-    ### EVERYTHING WORKS UP TO HERE
+
+    # Calculate probabilities
+    unigram_prob = {k: (float(v) / vocab) for k, v in unigram_freq.items()}
     unigram_freq["<start>"] = sent_count
+    bigram_prob = {k: float(v) / unigram_freq[k[0]] for k, v in bigram_freq.items()}
+    trigram_prob = {k: float(v) / bigram_freq[k[:2]] for k, v in trigram_freq.items()}
 
-    bigram_prob = {k: math.log((float(v) / unigram_freq[k[0]]), 2) for k, v in bigram_freq.items()}
-    print(sum(bigram_freq.values()))
-
-    bigram_freq[("<start>", "<start>")] = sent_count
-    trigram_prob = {k: math.log(float(v) / bigram_prob[k[:2]], 2) if k != "UNK" else math.log(float(v) / bigram_prob["UNK"], 2) for k, v in trigram_freq.items()}
-
-    return unigram_prob, bigram_prob, trigram_prob
-
-
-corpus_to_probabilities("1b_benchmark.train.tokens")
-
-
-
+    return unigram_prob, bigram_prob, trigram_prob, unked_tokens
