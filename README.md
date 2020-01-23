@@ -1,4 +1,4 @@
-##Unigram, Bigram and Trigram Language Models and Smoothing
+## Unigram, Bigram and Trigram Language Models and Smoothing
 
 ### About the dataset 
 There are three datasets provided (subsets of the One Billion Word Language Modeling Benchmark). 
