@@ -35,7 +35,6 @@ def corpus_to_probabilities(path):
     # Add UNKs to bigrams, trigrams
     freq = Counter(bigrams)
     tokens_w_unks = ["UNK" if freq[element] < 3 else element for element in bigrams]
-    unked_tokens = [element for element in bigrams if freq[element] < 3]
 
     # Create lists of bigrams and trigrams
     bigrams = list(ngrams(tokens_w_unks, 2))
@@ -54,11 +53,11 @@ def corpus_to_probabilities(path):
 
     # How big is the vocabulary
     vocab = sum(unigram_freq.values())
-
     # Calculate probabilities
-    unigram_prob = {k: (float(v) / vocab) for k, v in unigram_freq.items()}
+    unigram_prob = {k: float(v) / vocab for k, v in unigram_freq.items()}
     unigram_freq["<start>"] = sent_count
     bigram_prob = {k: float(v) / unigram_freq[k[0]] for k, v in bigram_freq.items()}
     trigram_prob = {k: float(v) / bigram_freq[k[:2]] for k, v in trigram_freq.items()}
 
-    return unigram_prob, bigram_prob, trigram_prob, unked_tokens
+    vocabulary = [u for u in unigram_prob.keys()]
+    return unigram_prob, bigram_prob, trigram_prob, vocabulary

@@ -36,5 +36,12 @@ The following folder contains two files `modelEvaluation.py` and `languageModels
 as well as the datasets, this README file and a `requirements.txt `. 
 If the program doesn't work then run `pip install requirements.txt` to install lacking requirements.
 
-### How to run & Explaining output 
+### How to run & Output 
+Run `modelEvaluation.py`. The `print_nicely()` function evaluates the 
+models and prints perplexities. 
 
+Output: 
+1) Perplexities for train data: unigram, bigram, trigram respectively
+2) Perplexities for dev data: unigram, bigram, trigram respectively
+3) Perplexities for test data: unigram, bigram, trigram respectively
+4) Smoothed perplexities using the best performing hyperparameters
