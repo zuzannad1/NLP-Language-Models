@@ -1,4 +1,7 @@
 ## Unigram, Bigram and Trigram Language Models and Smoothing
+### Run me in Google Colab Notebook 
+
+https://colab.research.google.com/drive/1AiOHCNk4knaGlbJ1Pj1Y6UDf0itCB7Zd 
 
 ### About the dataset 
 There are three datasets provided (subsets of the One Billion Word Language Modeling Benchmark). 
